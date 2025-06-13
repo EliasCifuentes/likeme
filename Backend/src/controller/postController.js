@@ -1,6 +1,7 @@
-import { getAllPostModel } from "../models/postModel.js";
+import { deletePostModel, getAllPostModel, updatePostModel } from "../models/postModel.js";
 import { createPostModel } from "../models/postModel.js";
 
+//GET
 export const getAllPost = async (req, res) => {
     try {
         const post = await getAllPostModel()
@@ -11,6 +12,7 @@ export const getAllPost = async (req, res) => {
     }
 }
 
+//POST
 export const createPost = async (req, res) => {
     try {
         const { titulo, img, descripcion, likes } = req.body
@@ -22,3 +24,31 @@ export const createPost = async (req, res) => {
     }
 }
 
+//PUT
+export const updatePost = async (req, res) => {
+    try {
+        const { id } = req.params
+        const updatePost = await updatePostModel(id)
+        console.log('Post actualizado')
+        res.json({ post: updatePost })
+    } catch (error) {
+        console.error('Error al incrementar likes:', error);
+        res.status(500).json({ error: 'No se pudo incrementar el like' });
+    }
+}
+
+//DELETE
+export const deletePost = async (req, res) => {
+    try {
+        const { id } = req.params
+        const deletePost = await deletePostModel(id)
+        if (deletePost === 0) {
+            return console.error('No se encuentra el post', error)
+        }
+        console.log('Post Eliminado')
+        res.json('Post Eliminado')
+    } catch (error) {
+        res.error({ error })
+        console.error('Error al eliminar Post', error)
+    }
+}
