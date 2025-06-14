@@ -1,7 +1,6 @@
 # likeme
 
-Profesora, No me cargaban bien las imagenes porque en el const post estaba: url: imgSrc, y yo en el backend lo tenia con img,
-en el frontend lo cambie a img y funciono.
+Profesora, Realice el cambio que me comento en la revision del desafio anterior y funciono perfecto, muchas gracias por la retroalimentacion.
 
 const agregarPost = async () => {
     const post = { titulo, img: imgSrc, descripcion }; // en esta linea estaba url: imgSrc
