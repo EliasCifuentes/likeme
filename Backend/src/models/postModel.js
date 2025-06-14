@@ -4,41 +4,54 @@ import pool from "../../db/config.js"
 
 //GET
 export const getAllPostModel = async () => {
-    const sqlQuery = { text: 'SELECT * FROM posts' }
-    const result = await pool.query(sqlQuery)
-    console.log(result.rows)
-    return result.rows
+    try {
+        const result = await pool.query({ text: 'SELECT * FROM posts' })
+        return result.rows
+    } catch (error) {
+        throw new Error('Error al obtener los posts desde la base de datos')
+    }
 }
 
 //POST
 export const createPostModel = async ({ titulo, img, descripcion, likes = 0 }) => {
-    //const newId = uuidv4()
-    const sqlQuery = {
-        text: 'INSERT INTO posts (titulo, img, descripcion, likes) VALUES ($1,$2,$3,$4) RETURNING *',
-        values: [titulo, img, descripcion, likes]
+    try {
+        const sql = {
+            text: 'INSERT INTO posts (titulo, img, descripcion, likes) VALUES ($1,$2,$3,$4) RETURNING *',
+            values: [titulo, img, descripcion, likes]
+        }
+        const result = await pool.query(sql)
+        return result.rows[0]
+    } catch (error) {
+        throw new Error('Error al crear el post')
     }
-    const result = await pool.query(sqlQuery)
-    return result.rows[0]
 }
 
 //PUT
 export const updatePostModel = async (id) => {
-    const sqlQuery = {
-        text: 'UPDATE posts SET likes = likes + 1  WHERE id= $1 RETURNING *',
-        values: [id]
+    try {
+        const sql = {
+            text: 'UPDATE posts SET likes = likes + 1 WHERE id = $1 RETURNING *',
+            values: [id]
+        }
+        const result = await pool.query(sql)
+        return result.rows[0]
+    } catch (error) {
+        throw new Error('Error al actualizar el like del post')
     }
-    const result = await pool.query(sqlQuery)
-    return result.rows[0]
 }
 
 //DELETE
 export const deletePostModel = async (id) => {
-    const sqlQuery = {
-        text: 'DELETE FROM posts WHERE id = $1 RETURNING *',
-        values: [id]
+    try {
+        const sql = {
+            text: 'DELETE FROM posts WHERE id = $1 RETURNING *',
+            values: [id]
+        }
+        const result = await pool.query(sql)
+        return result.rowCount
+    } catch (error) {
+        throw new Error('Error al eliminar el post')
     }
-    const result = await pool.query(sqlQuery)
-    return result.rowCount
 }
 
 

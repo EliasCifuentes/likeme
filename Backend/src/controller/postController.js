@@ -2,53 +2,63 @@ import { deletePostModel, getAllPostModel, updatePostModel } from "../models/pos
 import { createPostModel } from "../models/postModel.js";
 
 //GET
-export const getAllPost = async (req, res) => {
+export const getAllPost = async (req, res, next) => {
     try {
-        const post = await getAllPostModel()
-        res.json(post)
+        const posts = await getAllPostModel()
+        res.json(posts)
+        console.log('Datos obetenidos correctamente')
     } catch (error) {
-        console.error('Error en la solicitud', error)
-        res.status(500).json({ error: 'Error al obtener los posts' });
+        next(error)
     }
 }
 
 //POST
-export const createPost = async (req, res) => {
+export const createPost = async (req, res, next) => {
     try {
         const { titulo, img, descripcion, likes } = req.body
-        console.log('Datos recibidos:', req.body);// prueba
+        if (!titulo || !img || !descripcion) {
+            const error = new Error("Todos los campos son obligatorios")
+            error.statusCode = 400
+            throw error
+        }
         const newPost = await createPostModel({ titulo, img, descripcion, likes })
-        res.json({ post: newPost })
+        res.status(201).json({ message: 'Post creado correctamente', post: newPost })
+        console.log('Post Agregado')
     } catch (error) {
-        console.error('Error alingresar datos: ', error)
+        next(error)
     }
 }
 
 //PUT
-export const updatePost = async (req, res) => {
+export const updatePost = async (req, res, next) => {
     try {
         const { id } = req.params
-        const updatePost = await updatePostModel(id)
+        const updated = await updatePostModel(id)
+        if (!updated) {
+            const error = new Error("Post no encontrado")
+            error.statusCode = 404
+            throw error
+        }
+        res.json({ message: 'Post actualizado correctamente', post: updated })
         console.log('Post actualizado')
-        res.json({ post: updatePost })
     } catch (error) {
-        console.error('Error al incrementar likes:', error);
-        res.status(500).json({ error: 'No se pudo incrementar el like' });
+        next(error)
     }
 }
 
 //DELETE
-export const deletePost = async (req, res) => {
+export const deletePost = async (req, res, next) => {
     try {
         const { id } = req.params
-        const deletePost = await deletePostModel(id)
-        if (deletePost === 0) {
-            return console.error('No se encuentra el post', error)
+        const deleted = await deletePostModel(id)
+        if (deleted === 0) {
+            const error = new Error("Post no encontrado")
+            error.statusCode = 404
+            throw error
         }
+        res.json({ message: 'Post eliminado correctamente' })
         console.log('Post Eliminado')
-        res.json('Post Eliminado')
     } catch (error) {
-        res.error({ error })
-        console.error('Error al eliminar Post', error)
+        next(error)
     }
 }
